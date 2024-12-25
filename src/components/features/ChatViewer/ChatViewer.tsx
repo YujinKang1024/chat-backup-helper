@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GroupedMessages } from '../../types/chat';
+import { GroupedMessages } from '../../../types/chat';
 import {
   Upload,
   ChevronLeft,
@@ -7,7 +7,8 @@ import {
   Download,
   Calendar,
 } from 'lucide-react';
-import { parseKakaoChat, groupMessagesByDate } from '../../lib/parser';
+import { parseKakaoChat, groupMessagesByDate } from '../../../lib/parser';
+import { DateRangeDownload } from './DateRangeDownload';
 
 export const ChatViewer = () => {
   const [groupedMessages, setGroupedMessages] = useState<GroupedMessages>({});
@@ -113,13 +114,21 @@ export const ChatViewer = () => {
             </select>
           </div>
 
-          <button
-            onClick={handleDownload}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            대화 내용 다운로드
-          </button>
+          {dates.length > 0 && (
+            <>
+              <DateRangeDownload
+                groupedMessages={groupedMessages}
+                dates={dates}
+              />
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                대화 내용 전체 다운로드
+              </button>
+            </>
+          )}
         </div>
       )}
 
