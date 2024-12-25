@@ -11,17 +11,26 @@ export const parseKakaoChat = (text: string): ChatMessage[] => {
     );
 
     if (messageMatch) {
-      const [_, year, month, day, ampm, hour, minute, sender, content] =
+      const [, year, month, day, ampm, hour, minute, sender, content] =
         messageMatch;
 
       if (content.trim() === '이모티콘') {
         return;
       }
 
+      let adjustedHour = parseInt(hour);
+      if (ampm === '오후' && adjustedHour !== 12) {
+        adjustedHour += 12;
+      } else if (ampm === '오전' && adjustedHour === 12) {
+        adjustedHour = 0;
+      }
+
       const timestamp = new Date(
         parseInt(year),
         parseInt(month) - 1,
-        parseInt(day)
+        parseInt(day),
+        adjustedHour,
+        parseInt(minute)
       );
 
       messages.push({
