@@ -2,20 +2,27 @@ import { ChatMessage, GroupedMessages } from '../types/chat';
 import _ from 'lodash';
 
 export const parseKakaoChat = (text: string): ChatMessage[] => {
-  const lines = text.split('\n').filter((line) => line.trim());
+  const lines = text.split('\n');
   const messages: ChatMessage[] = [];
+  let currentMessage: ChatMessage | null = null;
 
-  lines.forEach((line) => {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const messageMatch = line.match(
       /(\d{4})년 (\d{1,2})월 (\d{1,2})일 (오전|오후) (\d{1,2}):(\d{2}), (.+?) : (.+)/
     );
 
     if (messageMatch) {
+      if (currentMessage) {
+        messages.push(currentMessage);
+      }
+
       const [, year, month, day, ampm, hour, minute, sender, content] =
         messageMatch;
 
       if (content.trim() === '이모티콘') {
-        return;
+        currentMessage = null;
+        continue;
       }
 
       let adjustedHour = parseInt(hour);
@@ -33,13 +40,24 @@ export const parseKakaoChat = (text: string): ChatMessage[] => {
         parseInt(minute)
       );
 
-      messages.push({
+      currentMessage = {
         timestamp,
         sender,
-        content,
-      });
+        content: content,
+      };
+    } else if (currentMessage && line.trim()) {
+      const nextMessageMatch = line.match(
+        /\d{4}년 \d{1,2}월 \d{1,2}일 (오전|오후) \d{1,2}:\d{2}/
+      );
+      if (!nextMessageMatch) {
+        currentMessage.content += '\n' + line;
+      }
     }
-  });
+  }
+
+  if (currentMessage) {
+    messages.push(currentMessage);
+  }
 
   return messages;
 };
