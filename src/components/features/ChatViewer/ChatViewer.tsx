@@ -23,7 +23,8 @@ export const ChatViewer = () => {
 
     try {
       const text = await file.text();
-      const messages = parseKakaoChat(text);
+      const fileType = file.name.toLowerCase().endsWith('.csv') ? 'csv' : 'txt';
+      const messages = parseKakaoChat(text, fileType);
       const grouped = groupMessagesByDate(messages);
       setGroupedMessages(grouped);
       setCurrentPage(1);
@@ -90,7 +91,7 @@ export const ChatViewer = () => {
             id="file-upload"
             type="file"
             className="hidden"
-            accept=".txt"
+            accept=".txt,.csv"
             onChange={handleFileUpload}
           />
         </label>
