@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { GroupedMessages, ChatMessage } from '../../../types/chat';
+import { GroupedMessages } from '../../../types/chat';
 import { Download } from 'lucide-react';
+import { formatMessagesForDownload } from '../../../lib/parser';
 
 interface DateRangeDownloadProps {
   groupedMessages: GroupedMessages;
@@ -25,12 +26,6 @@ export const DateRangeDownload = ({
     if (!startDate || date >= startDate) {
       setEndDate(date);
     }
-  };
-
-  const formatMessagesForDownload = (messages: ChatMessage[]) => {
-    return messages
-      .map((message) => `${message.sender}: ${message.content}`)
-      .join('\n');
   };
 
   const handleSingleDateDownload = (date: string) => {

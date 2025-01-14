@@ -7,7 +7,11 @@ import {
   Download,
   Calendar,
 } from 'lucide-react';
-import { parseKakaoChat, groupMessagesByDate } from '../../../lib/parser';
+import {
+  parseKakaoChat,
+  groupMessagesByDate,
+  formatMessagesForDownload,
+} from '../../../lib/parser';
 import { DateRangeDownload } from './DateRangeDownload';
 
 export const ChatViewer = () => {
@@ -57,9 +61,7 @@ export const ChatViewer = () => {
     let content = '';
     dates.forEach((date) => {
       content += `${date}\n\n`;
-      groupedMessages[date].forEach((message) => {
-        content += `${message.sender}: ${message.content}\n`;
-      });
+      content += formatMessagesForDownload(groupedMessages[date]);
       content += '\n';
     });
 
@@ -139,16 +141,25 @@ export const ChatViewer = () => {
             {date}
           </h2>
           <div className="space-y-4">
-            {groupedMessages[date].map((message, index) => (
-              <div key={index} className="flex items-start gap-6">
-                <div className="min-w-[100px] font-bold text-blue-600 text-right">
-                  {message.sender}
+            {groupedMessages[date].map((message, index, messages) => {
+              const prevMessage = index > 0 ? messages[index - 1] : null;
+              const isSameSender = prevMessage?.sender === message.sender;
+
+              return (
+                <div key={index} className="flex items-start gap-6">
+                  <div className="min-w-[100px] font-bold text-blue-600 text-right">
+                    {!isSameSender ? message.sender : ''}
+                  </div>
+                  <div
+                    className={`flex-1 bg-gray-50 p-3 rounded-lg text-gray-700 ${
+                      isSameSender ? 'mt-1' : ''
+                    }`}
+                  >
+                    {message.content}
+                  </div>
                 </div>
-                <div className="flex-1 bg-gray-50 p-3 rounded-lg text-gray-700">
-                  {message.content}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       ))}

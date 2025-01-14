@@ -119,6 +119,22 @@ const parseCsvChat = (csvText: string): ChatMessage[] => {
     .filter((msg: ChatMessage | null): msg is ChatMessage => msg !== null);
 };
 
+export const formatMessagesForDownload = (messages: ChatMessage[]): string => {
+  let content = '';
+  let prevSender: string | null = null;
+
+  messages.forEach((message) => {
+    if (message.sender !== prevSender) {
+      content += `${message.sender}: ${message.content}\n`;
+      prevSender = message.sender;
+    } else {
+      content += `${message.content}\n`;
+    }
+  });
+
+  return content;
+};
+
 export const parseKakaoChat = (
   text: string,
   fileType: 'txt' | 'csv'
